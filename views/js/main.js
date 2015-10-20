@@ -499,17 +499,20 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
 // Moves the sliding background pizzas based on scroll position
-
-var items = document.getElementById('.mover');
-
+// Moves the sliding background pizzas based on scroll position
 function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var scrollTopAmt = document.scrollTop/1250;
-
-  for (var i = 0; i < 5; i++) {
-    var phase = Math.sin((scrollTopAmt) + (i % 5));
+  var items = document.querySelectorAll('.mover');
+  console.log("======================= New call to updatePositions =======================");
+  for (var i = 0; i < items.length; i++) {
+    console.log("----");
+    console.log("i = " + i);
+    console.log("i % 5 = " + (i % 5));
+    console.log("document.body.scrollTop = " + document.body.scrollTop);
+    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    console.log("phase = " + phase);
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
 
@@ -522,6 +525,34 @@ function updatePositions() {
     logAverageFrame(timesToUpdatePosition);
   }
 }
+
+
+
+
+/*
+function updatePositions() {
+  frame++;
+  window.performance.mark("mark_start_frame");
+
+  var scrollTopAmt = document.body.scrollTop;
+  var itemLength = items.length;
+  var items = document.getElementById('.mover');
+  for (var i = 0; i < itemLength; i++) {
+    var phase = Math.sin((scrollTopAmt/1250) + (i % 5));
+    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    }
+  }
+
+  // User Timing API to the rescue again. Seriously, it's worth learning.
+  // Super easy to create custom metrics.
+  window.performance.mark("mark_end_frame");
+  window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
+  if (frame % 10 === 0) {
+    var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
+    logAverageFrame(timesToUpdatePosition);
+  }
+}
+*/
 
 // runs updatePositions on scroll
 window.addEventListener('scroll', updatePositions);
